@@ -1,0 +1,463 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import studentInfo, scholars, Requirement, applicants
+from django.contrib.auth.models import User
+from django.core.files.storage import FileSystemStorage
+import pytesseract
+from PIL import Image, ImageEnhance, ImageFilter
+import os
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .forms import RequirementForm, applicantsForm
+from django.http import HttpResponse
+
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+@login_required
+def home(request):
+    return render(request, 'home.html', {})
+
+def studentapplicationform(request):
+    studID = request.user.username
+    student = get_object_or_404(studentInfo, studID=studID)
+    passed = applicants.objects.filter(studID_id=studID).exists()
+    context = {'student': student, 'passed': passed}
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        student_ID = request.POST.get('studID')
+
+        if action == 'submit':
+            # Check if the requirement already exists
+            if applicants.objects.filter(studID_id=student_ID).exists():
+                print("student id already exists")
+                context['error'] = "Student ID already exists"
+            else:
+                form = applicantsForm(request.POST, request.FILES)
+                if form.is_valid():
+                    form.save()
+                    print("form saved")
+                    if applicants.objects.filter(studID_id=student_ID).exists():
+                        passed = True
+                    context.update({'passed': passed})
+                    return render(request, 'studentapplicationform.html', context)  # Redirect to the same page or any other success page
+                else:
+                    # Print form errors for debugging
+                    print(form.errors)  # Add this line to print the form errors to the console
+                    print("error form")
+
+    return render(request, 'studentapplicationform.html', context)
+
+def adminapplication(request):
+    student_data = studentInfo.objects.all()
+    applicant_data = applicants.objects.filter(status='PENDING')
+    context = { 'student_data': student_data, 'applicant_data': applicant_data }
+    return render(request, 'adminapplication.html', context)
+
+@login_required
+def adminreqsubmission(request):
+    student_type = request.GET.get('student_type')
+    context = {}
+
+    if student_type == 'SCHOLAR':
+        scholar_data = scholars.objects.all()
+        requirement_data = Requirement.objects.filter(type='SCHOLAR')
+        context = {
+            'student_type': student_type,
+            'scholar_data': scholar_data,
+            'requirement_data': requirement_data,
+        }
+        for scholar in requirement_data:
+            print("COR File URL:", scholar.cor_file.url)
+            print("Grade File URL:", scholar.grade_file.url)
+            print("School ID File URL:", scholar.schoolid_file.url)
+            print()
+    elif student_type == 'NON_SCHOLAR':
+        scholar_data = scholars.objects.all()
+        requirement_data = Requirement.objects.filter(type='NONSCHOLAR')
+        context = {
+            'student_type': student_type,
+            'requirement_data': requirement_data,
+        }
+    
+    return render(request, 'adminrequirements.html', context)
+
+
+def studentreqsubmission(request):
+    studID = request.user.username  # Get the logged-in user's student ID
+    print("student id of the logged in user: ", studID)
+    semester = request.POST.get('semester')
+    passed = Requirement.objects.filter(studID_id=studID).exists()  # Check if the student ID and semester exist in the Requirement class
+    student = get_object_or_404(studentInfo, studID=studID)
+
+    # Print all records of the Requirement class
+    requirements = Requirement.objects.all()
+    for req in requirements:
+        print(f"ID: {req.id}")
+        print(f"Student ID: {req.studID.studID}")
+        print(f"Semester: {req.semester}")
+        print(f"GPA: {req.gpa}")
+        print(f"COR File: {req.cor_file.url if req.cor_file else 'No COR File'}")
+        print(f"Grade File: {req.grade_file.url if req.grade_file else 'No Grade File'}")
+        print(f"School ID File: {req.schoolid_file.url if req.schoolid_file else 'No School ID File'}")
+        print(f"Submission Date: {req.submission_date}")
+        print(f"Units: {req.units}")
+        print(f"Note: {req.note}")
+        print(f"Type: {req.type}")
+        print("---------------")
+
+    context = {
+        'student': student,
+        'passed': passed
+    }
+    print(context)
+    return render(request, 'studentrequirements.html', context)
+
+
+def save_requirements(request):
+    passed = False
+    if request.method == 'POST':
+        student_ID = request.POST.get('student_ID')
+        semester = request.POST.get('semester')
+
+        # Check if the requirement already exists
+        if Requirement.objects.filter(studID_id=student_ID, semester=semester).exists():
+            messages.error(request, 'You already have passed the requirements for this semester.')
+        else:
+            form = RequirementForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Requirements submitted successfully.')
+                if Requirement.objects.filter(studID_id=student_ID, semester=semester).exists():
+                    passed = True
+                return render(request, 'studentrequirements.html', {'passed': passed})  # Redirect to the same page or any other success page
+            else:
+                # Print form errors for debugging
+                print(form.errors)  # Add this line to print the form errors to the console
+                messages.error(request, 'Error in form submission.')
+
+        return render(request, 'studentrequirements.html', {'form': form, 'student': student})  # Pass form back to the template
+    else:
+        form = RequirementForm()
+        student = get_object_or_404(studentInfo, studID=request.user.username)
+    return render(request, 'studentrequirements.html', {'form': form, 'student': student})
+                  
+def calculate_gpa_from_text(text):
+    grades_units = {}
+    total_units = 0  # Initialize total units
+    for line in text.split('\n'):
+        parts = line.split()
+        if len(parts) >= 3:
+            subject = ' '.join(parts[:-2])
+            try:
+                grade = float(parts[-2])
+                units = float(parts[-1])
+                grades_units[subject] = (grade, units)
+                total_units += units  # Accumulate total units
+            except ValueError:
+                continue
+        elif line.startswith("Total units"):
+            total_units = float(line.split()[-1])  # Extract total units from "Total units" line
+
+    grade_points_mapping = {
+        4.0: 4.0,
+        3.5: 3.5,
+        3.0: 3.0,
+        2.5: 2.5,
+        2.0: 2.0,
+        1.5: 1.5,
+        1.0: 1.0,
+        0.0: 0.0
+    }
+
+    total_grade_points = 0
+
+    for grade, units in grades_units.values():
+        total_grade_points += grade_points_mapping.get(grade, 0) * units
+
+    gpa = total_grade_points / total_units if total_units > 0 else 0
+
+    return round(gpa, 2), total_units, total_grade_points
+
+def process_grade_image(request):
+    if request.method == 'POST' and request.FILES.get('gradeFile'):
+        grade_file = request.FILES['gradeFile']
+        fs = FileSystemStorage()
+        filename = fs.save(grade_file.name, grade_file)
+        file_path = fs.path(filename)
+
+        # Preprocess the image for better OCR accuracy
+        image = Image.open(file_path)
+        image = image.convert('L')  # Convert to grayscale
+        image = image.filter(ImageFilter.SHARPEN)  # Sharpen the image
+        image = ImageEnhance.Contrast(image).enhance(2)  # Enhance contrast
+        extracted_text = pytesseract.image_to_string(image)
+
+        # Print the extracted text in the terminal
+        print("Extracted Text:")
+        print(extracted_text)
+
+        # Calculate GPA, total units, and total grade points from the extracted text
+        gpa, total_units, total_grade_points = calculate_gpa_from_text(extracted_text)
+
+        # Clean up the uploaded file
+        os.remove(file_path)
+
+        # Print the values in the terminal
+        print("GPA:", gpa)
+        print("Total Units:", total_units)
+        print("Total Grade Points:", total_grade_points)
+
+        return JsonResponse({'success': True, 'gpa': gpa, 'total_units': total_units})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+def scholars_profile_admin(request):
+    if request.method == 'POST':
+        # Extract values from the POST request
+        student_ID = request.POST.get('student_id')
+        scholar_ID = request.POST.get('scholar_ID')
+        scholar_type = request.POST.get('scholar_type')
+        amount = request.POST.get('amount')
+        gpa = request.POST.get('gpa')
+        
+        # Validate inputs
+        if not (student_ID and scholar_ID and scholar_type and amount and gpa):
+            return HttpResponse('All fields are required.', status=400)
+
+        # Convert necessary fields to appropriate data types
+        try:
+            student_ID = int(student_ID)
+            scholar_ID = int(scholar_ID)
+            amount = int(amount)
+            gpa = float(gpa)
+        except ValueError:
+            return HttpResponse('Invalid input. Please enter valid numbers.', status=400)
+
+        # Check if the scholar with the given ID already exists
+        existing_scholar = scholars.objects.filter(scholar_ID=scholar_ID).first()
+
+        if existing_scholar:
+            # Update existing scholar's information
+            existing_scholar.student_ID = student_ID
+            existing_scholar.scholar_type = scholar_type
+            existing_scholar.amount = amount
+            existing_scholar.gpa = gpa
+            existing_scholar.save()
+            
+            return HttpResponse('Scholar information updated successfully.')
+        else:
+            # Create a new instance if the scholar doesn't exist
+            new_scholar = scholars.objects.create(
+                scholar_ID=scholar_ID,
+                student_ID=student_ID,
+                scholar_type=scholar_type,
+                amount=amount,
+                gpa=gpa
+            )
+            return HttpResponse('New scholar information saved successfully.')
+    return render(request, 'scholarsprofileadmin.html', {})
+
+def add_scholar(request):
+    if request.method == 'POST':
+        # Extract values from the POST request
+        student_ID = request.POST.get('student_id')
+        scholar_ID = request.POST.get('scholar_ID')
+        scholar_type = request.POST.get('scholar_type')
+        amount = request.POST.get('amount')
+        gpa = request.POST.get('gpa')
+
+        # Get the student's information for displaying it in case of errors
+        student = None
+        try:
+            student = studentInfo.objects.get(studID=student_ID)
+        except studentInfo.DoesNotExist:
+            pass
+
+        # Validate inputs
+        if not (student_ID and scholar_ID and scholar_type and amount and gpa):
+            context = {
+                'error_message': 'All fields are required.',
+                'student': student
+            }
+            return render(request, 'scholarsprofileadmin.html', context)
+
+        # Convert necessary fields to appropriate data types
+        try:
+            student_ID = int(student_ID)
+            scholar_ID = int(scholar_ID)
+            amount = int(amount)
+            gpa = float(gpa)
+        except ValueError:
+            context = {
+                'error_message': 'Invalid input. Please enter valid numbers.',
+                'student': student
+            }
+            return render(request, 'scholarsprofileadmin.html', context)
+
+        # Check if the scholar with the given ID already exists
+        existing_scholar = scholars.objects.filter(scholar_ID=scholar_ID).first()
+
+        if existing_scholar:
+            # Set context variable for scholar ID already existing
+            context = {
+                'scholar_exists': True,
+                'student': student,
+                'error_message': 'Scholar with this ID already exists.',
+                'is_scholar': True  # Set is_scholar to True if the student is already a scholar
+            }
+            return render(request, 'scholarsprofileadmin.html', context)
+        else:
+            # Create a new instance if the scholar doesn't exist
+            new_scholar = scholars.objects.create(
+                scholar_ID=scholar_ID,
+                student_ID=student_ID,
+                scholar_type=scholar_type,
+                amount=amount,
+                gpa=gpa
+            )
+            return redirect('profile')
+    return render(request, 'scholarsprofileadmin.html', {})
+
+
+def scholars_profile_student(request):
+    studID = request.user.username
+    application_data = applicants.objects.filter(studID__studID=studID).first()
+    student_data = studentInfo.objects.filter(studID=studID).first()
+    scholars_table = scholars.objects.filter(studID_id=studID).first()
+    app_exist = application_data is not None
+    exist = scholars_table is not None
+    print("1")
+    edit_mode = request.session.get('edit_mode', False)
+    done_edit = request.session.get('done_edit', False)
+    print("2")
+    if request.method == 'POST':
+        print("3")
+        action = request.POST.get('action')
+        print(f"Form submitted with action: {action}")  # Debug print
+        if action == 'EDIT':
+            edit_mode = True
+            done_edit = False
+        elif action == 'DONE':
+            edit_mode = False
+            done_edit = True
+
+        request.session['edit_mode'] = edit_mode
+        request.session['done_edit'] = done_edit
+        print(f"edit_mode: {edit_mode}, done_edit: {done_edit}")  # Debug print
+
+    context = {
+        'application_data': application_data,
+        'student_data': student_data,
+        'scholars_table': scholars_table,
+        'app_exist': app_exist,
+        'exist': exist,
+        'edit_mode': edit_mode,
+        'done_edit': done_edit,
+        'cor_file_url': application_data.cor_file.url if application_data and application_data.cor_file else None,
+        'grade_file_url': application_data.grade_file.url if application_data and application_data.grade_file else None,
+        'schoolid_file_url': application_data.schoolid_file.url if application_data and application_data.schoolid_file else None,
+        'gpa_current': application_data.gpa if application_data and application_data.gpa else None,
+    }
+    
+    return render(request, 'scholarsprofilestudent.html', context)
+
+
+def grade_submission(request):
+    return render(request, 'gradesubmission.html', {})
+
+def mentorship(request):
+    return render(request, 'mentorship.html', {})
+
+def adminliquidation(request):
+    return render(request, 'adminliquidation.html', {})
+
+def chedreports(request):
+    return render(request, 'chedreports.html', {})
+
+def transactionreports(request):
+    return render(request, 'transactionreports.html', {})
+
+def signupuser(request):
+    error_message = None
+    success_message = None
+
+    if request.method == 'POST':
+        studentID = request.POST.get('studID')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        cpassword = request.POST.get('cpassword')
+
+        try:
+            student = studentInfo.objects.get(studID=studentID)
+        except studentInfo.DoesNotExist:
+            error_message = 'Invalid student ID.'
+
+        if not error_message:
+            if cpassword != password:
+                error_message = 'Passwords do not match.'
+            elif len(password) < 8:
+                error_message = 'Password must be at least 8 characters.'
+            elif User.objects.filter(username=studentID).exists():
+                error_message = 'Student ID already exists.'
+            elif User.objects.filter(email=email).exists():
+                error_message = 'Email already exists.'
+            else:
+                user = User.objects.create_user(username=studentID, email=email, password=password)
+                user.save()
+                success_message = 'Account created successfully'
+                return redirect('signinuser')
+
+    return render(request, 'register.html', {'error_message': error_message, 'success_message': success_message})
+
+def signinuser(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('set_password')
+
+        try:
+            user = User.objects.get(email=email)
+            if user.check_password(password):
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.error(request, 'Invalid email or password')
+        except User.DoesNotExist:
+            messages.error(request, 'Invalid email or password')
+
+    return render(request, 'log.html')
+
+def search_student(request):
+    query = request.GET.get('search_id')
+    student = None
+    invalid = False
+    invalid_input = False
+    is_scholar = False
+    not_scholar = False
+    scholar = None  # Initialize scholar object to None
+    if query:
+        if query.isnumeric():
+            try:
+                student = studentInfo.objects.get(studID=query)
+                # Check if the student is a scholar
+                if scholars.objects.filter(studID=query).exists():
+                    scholar = scholars.objects.get(studID=query)
+                    is_scholar = True
+                    not_scholar = False
+                    print("Not: ",not_scholar)
+                    print("Yes: ",is_scholar)
+                else:
+                    not_scholar = True
+                    is_scholar = False
+                    print("Not: ",not_scholar)
+                    print("Yes: ",is_scholar)
+            except studentInfo.DoesNotExist:
+                student = None
+                invalid = True
+        else:
+            invalid_input = True
+    return render(request, 'scholarsprofileadmin.html', {'student': student, 'invalid': invalid, 'invalid_input': invalid_input, 'is_scholar': is_scholar, 'scholar': scholar, 'not_scholar': not_scholar})
+

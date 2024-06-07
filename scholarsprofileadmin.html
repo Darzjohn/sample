@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>STUDENT LIFE INFORMATION SYSTEM</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/scholarsprofileadmin.css' %}">
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <!-- {% block headcontent %}
+
+    {% endblock headcontent %} -->
+</head>
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+<body>
+    <div class="side_nav_box">
+        <div class="orange-bar">
+            <img src="/static/imgs/CTU_logo.png" class="logo" alt="CTU Logo">
+            <img src="/static/imgs/barSort.png" class="bars" alt="Bars">
+        </div>
+        <nav class="side-nav">
+            <ul>
+                <li>
+                    <a href="#" class="studentlife-btn">OFFICE OF STUDENT LIFE 
+                        <span class="fas fa-caret-down first"></span>
+                    </a>
+                    <ul class="studentlife">
+                        <li><a href="#">Equipment</a></li>
+                        <li><a href="#">Good Moral Certificate Issuance</a></li>
+                        <li><a href="#">PPMP Tracker</a></li>
+                        <li><a href="#">Monthly Calendar of Activities</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="scholar-btn">SCHOLARSHIP
+                        <span class="fas fa-caret-down second"></span>
+                    </a>
+                    <ul class="scholar-show">
+                        <li><a href="{% url "admin_req" %}">Submission of Requirements tracker</a></li>
+                        <li><a href="{% url "student_req" %}">Submission of Requirements</a></li>
+                        <li><a href="{% url "profile" %}">Scholars Profile and Validation</a></li>
+                        <li><a href="{% url "profile_student" %}">Scholars Profile</a></li>
+                        <li><a href="{% url "grade" %}">Grade Submission with GPA Computation</a></li>
+                        <li><a href="{% url "mentor" %}">Mentorship Program</a></li>
+                        <li><a href="{% url "liquidation" %}">Admin Cost Liquidation Tracker</a></li>
+                        <li><a href="{% url "ched" %}">CHED Reports Submission</a></li>
+                        <li><a href="{% url "transaction" %}">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="jobplace-btn">JOB PLACEMENT
+                        <span class="fas fa-caret-down third"></span>    
+                    </a>
+                    <ul class="jobplace-show">
+                        <li><a href="#">OJT Hiring</a></li>
+                        <li><a href="#">Career Guidance Tracker</a></li>
+                        <li><a href="#">OJT Requirements Tracker</a></li>
+                        <li><a href="#">Non-Academic Award Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="student_disc-btn">STUDENT DISCIPLINE
+                       <span class="fas fa-caret-down fourth"></span>
+                    </a>
+                    <ul class="student_disc-show">
+                        <li><a href="#">Case Profile</a></li>
+                        <li><a href="#">Hours Rendered for Community Service Tracker</a></li>
+                        <li><a href="#">Good Moral Certificate Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="guide-btn">GUIDANCE
+                       <span class="fas fa-caret-down fifth"></span>
+                    </a>
+                    <ul class="guide-show">
+                        <li><a href="#">Individual Profile with Guidance Concern</a></li>
+                        <li><a href="#">Counseling App with Scheduler</a></li>
+                        <li><a href="#">Intake Interview</a></li>
+                        <li><a href="#">Exit Interview</a></li>
+                        <li><a href="#">OJT Assessments/Psychological Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="alumni-btn">ALUMNI
+                       <span class="fas fa-caret-down sixth"></span>
+                    </a>
+                    <ul class="alumni-show">
+                        <li><a href="#">Alumni ID Requests</a></li>
+                        <li><a href="#">Graduate Tracer</a></li>
+                        <li><a href="#">Alumni Reunion and Events</a></li>
+                        <li><a href="#">Job Fairs</a></li>
+                        <li><a href="#">Digital Yearbook</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="community-btn">COMMUNITY INVOLVEMENT
+                       <span class="fas fa-caret-down seventh"></span>
+                    </a>
+                    <ul class="community-show">
+                        <li><a href="#">Events</a></li>
+                        <li><a href="#">CrowdFunding Projects</a></li>
+                        <li><a href="#">Donatio App</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="student_org-btn">STUDENT ORGANIZATION
+                       <span class="fas fa-caret-down eighth"></span>
+                    </a>
+                    <ul class="student_org-show">
+                        <li><a href="#">Org Profile</a></li>
+                        <li><a href="#">Projects and Accomplishments</a></li>
+                        <li><a href="#">Financial Statements Reports</a></li>
+                        <li><a href="#">Accreditation Application</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="medical-btn">MEDICAL
+                       <span class="fas fa-caret-down ninth"></span>
+                    </a>
+                    <ul class="medical-show">
+                        <li><a href="#">Patient Profile</a></li>
+                        <li><a href="#">Student Medical Requirements Tracker</a></li>
+                        <li><a href="#">Emergency Health Assistance</a></li>
+                        <li><a href="#">PWD Profile</a></li>
+                        <li><a href="#">Dental Services</a></li>
+                        <li><a href="#">Medical Clearance Issuance</a></li>
+                        <li><a href="#">Prescription Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="content_box">
+        <div class="search-container">
+            <div class="search-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <input type="text" placeholder="Search...">
+            <a href="{% url "logout" %}"><button style="padding: 10px 20px; background-color: #FF8000; border-radius: 5px; border: none; margin-left: 520px;">Log out</button></a>
+        </div>
+        <div class="content">
+            <div class="form_div">
+                <h1>Scholar's Profile and Validation</h1>
+                <form class="search_id_container" action="{% url 'search_student' %}" method="GET">
+                    <input type="text" id="search-box" name="search_id" placeholder="Search by Student ID">
+                    <button id="search-btn">Search</button>
+                </form>
+                <form id="display_search" action="{% url "add_scholar" %}" method="POST">
+                    {% csrf_token %}
+                    {% if student %}
+                        <div>
+                            <label for="">Student ID:</label>
+                            <input type="text" name="student_id" value="{{ student.studID }}" >
+                        </div>
+                        <div>
+                            <label for="">LRN:</label>
+                            <input type="text" name="lrn" value="{{ student.lrn }}" disabled>
+                        </div>
+                        <div>
+                            <label for="">First Name:</label>
+                            <input type="text" name="fname" value="{{ student.firstname }}" disabled>
+                        </div>
+                        <div>
+                            <label for="">Middle Name:</label>
+                            <input type="text" name="mname" value="{{ student.middlename }}" disabled>
+                        </div>
+                        <div>
+                            <label for="">Last Name:</label>
+                            <input type="text" name="lname" value="{{ student.lastname }}" disabled>
+                        </div>
+                        <div>
+                            <label for="">College Program:</label>
+                            <input type="text" name="college_prog" value="{{ student.degree }}" disabled>
+                        </div>
+                        <div>
+                            {% comment %} style="display: {% if scholar %} flex; {% else %} none; {% endif %}" {% endcomment %}
+                            <label for="scholar_ID">Scholar ID:</label>
+                            <input type="text" name="scholar_ID" value="{% if is_scholar %}{{ scholar.scholar_ID }}{% endif %}">
+                        </div>
+                        <div>
+                            <label for="semester">Scholarship Type:</label>
+                            <select style="color: black;" id="scholar_type" name="scholar_type" required>
+                                <option style="color: black;" value="">SELECT TYPE OF SCHOLAR</option>
+                                <option style="color: black;" value="ched_full_merit" {% if is_scholar and scholar.scholar_type == 'ched_full_merit' %} selected {% endif %}>CHED FULL MERIT</option>
+                                <option style="color: black;" value="ched_half_merit" {% if is_scholar and scholar.scholar_type == 'ched_half_merit' %} selected {% endif %}>CHED HALF MERIT</option>                              
+                                <option style="color: black;" value="ched_tulong_dunong" {% if is_scholar and scholar.scholar_type == 'ched_tulong_dunong' %} selected {% endif %}>CHED TULONG DUNONG</option>
+                                <option style="color: black;" value="ched_tes" {% if is_scholar and scholar.scholar_type == 'ched_tes' %} selected {% endif %}>CHED TERTIARY EDUCATION SUBSIDY</option>
+                                <option style="color: black;" value="ateasp" {% if is_scholar and scholar.scholar_type == 'ateasp' %} selected {% endif %}>ARGAO TERTIARY EDUCATION ASSISTANCE PROGRAM</option>
+                                <option style="color: black;" value="dost_undergrad" {% if is_scholar and scholar.scholar_type == 'dost_undergrad' %} selected {% endif %}>DOST UNDERGRAD</option>
+                                <option style="color: black;" value="with_high_honor" {% if is_scholar and scholar.scholar_type == 'with_high_honor' %} selected {% endif %}>WITH HIGH HONOR</option>
+                                <option style="color: black;" value="natures_spring" {% if is_scholar and scholar.scholar_type == 'natures_spring' %} selected {% endif %}>NATURE'S SPRING FOUNDATION INC</option>
+                                <option style="color: black;" value="life_foundation" {% if is_scholar and scholar.scholar_type == 'life_foundation' %} selected {% endif %}>LIFE BANK FOUNDATION</option>
+                            </select>
+                        </div>
+                        <p>
+                            {% comment %} class="{% if is_scholar %} {% else %} hidden {% endif %}" {% endcomment %}
+                            <label for="scholar_status">Scholar Status:</label>
+                            <select style="color: black;" id="scholar_status" name="scholar_status" required>
+                                <option style="color: black;" value="">SELECT SCHOLAR STATUS</option>
+                                <option style="color: black;" value="active" {% if is_scholar and scholar.scholar_status == 'active' %} selected {% endif %}>ACTIVE</option>
+                                <option style="color: black;" value="inactive" {% if is_scholar and scholar.scholar_status == 'inactive' %} selected {% endif %}>INACTIVE</option>
+                                <option style="color: black;" value="graduated" {% if is_scholar and scholar.scholar_status == 'graduated' %} selected {% endif %}>GRADUATED</option>
+                                <option style="color: black;" value="dropped" {% if is_scholar and scholar.scholar_status == 'dropped' %} selected {% endif %}>DROPPED</option>
+                            </select>
+                        </p>
+                        <div>
+                            {% comment %} style="display: {% if scholar %} flex; {% else %} none; {% endif %}" {% endcomment %}
+                            <label for="amount">Amount:</label>
+                            <input type="text" id="amount" name="amount" value="{% if is_scholar %}{{ scholar.amount }}{% endif %}">
+                        </div>
+                        <div>
+                            {% comment %} style="display: {% if scholar %} flex; {% else %} none; {% endif %}" {% endcomment %}
+                            <label for="gpa">GPA:</label>
+                            <input type="text" name="gpa" value="{% if is_scholar %}{{ scholar.gpa }}{% endif %}">
+                        </div>
+                        {% if error_message %}
+                        <p style="color: red;">{{ error_message }}</p>
+                        {% endif %}
+                        {% if scholar_exists %}
+                            <p style="color: red;">ScholarId already exists.</p>
+                        {% endif %}
+                        <div style="border: 1px solid black; width: fit-content;">
+                            <button name="action" value="UPDATE" style="display: {% if scholar %} flex; {% else %} none; {% endif %}">UPDATE</button><button name="action" value="ADD" style="display: {% if scholar %} none; {% else %} flex;  {% endif %}">ADD</button>
+                        </div>
+                    {% else %}
+                        {% if invalid %}
+                            <p style="color: black;">No student found with the given ID.</p>
+                        {% elif invalid_input %}
+                        <p style="color: black;">Invalid input.</p>
+                        {% endif %}
+                    {% endif %}
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('scholar_type').addEventListener('change', function() {
+            const amountInput = document.getElementById('amount');
+            console.log('Selected value:', this.value); // Log the selected value
+            console.log('Amount input:', amountInput);
+            switch (this.value) {
+                case 'ched_full_merit':
+                    amountInput.value = '20000';
+                    break;
+                case 'ched_half_merit':
+                    amountInput.value = '10000';
+                    break;
+                case 'ched_tulong_dunong':
+                    amountInput.value = '7500';
+                    break;
+                case 'ched_tes':
+                    amountInput.value = '20000';
+                    break;
+                case 'ateasp':
+                    amountInput.value = '5000';
+                    break;
+                case 'dost_undergrad':
+                    amountInput.value = '45000';
+                    break;
+                case 'with_high_honor':
+                    amountInput.value = '25000';
+                    break;
+                case 'natures_spring':
+                    amountInput.value = '3000';
+                    break;
+                case 'life_foundation':
+                    amountInput.value = '2000';
+                    break;
+                default:
+                    amountInput.value = '';
+                    break;
+            }
+        });
+        
+    </script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

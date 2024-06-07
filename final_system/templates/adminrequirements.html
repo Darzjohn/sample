@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>STUDENT LIFE INFORMATION SYSTEM</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/adminrequirements.css' %}">
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <!-- {% block headcontent %}
+
+    {% endblock headcontent %} -->
+</head>
+<body>
+    <div class="side_nav_box">
+        <div class="orange-bar">
+            <img src="/static/imgs/CTU_logo.png" class="logo" alt="CTU Logo">
+            <img src="/static/imgs/barSort.png" class="bars" alt="Bars">
+        </div>
+        <nav class="side-nav">
+            <ul>
+                <li>
+                    <a href="#" class="studentlife-btn">OFFICE OF STUDENT LIFE 
+                        <span class="fas fa-caret-down first"></span>
+                    </a>
+                    <ul class="studentlife">
+                        <li><a href="#">Equipment</a></li>
+                        <li><a href="#">Good Moral Certificate Issuance</a></li>
+                        <li><a href="#">PPMP Tracker</a></li>
+                        <li><a href="#">Monthly Calendar of Activities</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="scholar-btn">SCHOLARSHIP
+                        <span class="fas fa-caret-down second"></span>
+                    </a>
+                    <ul class="scholar-show">
+                        <li><a href="{% url "admin_req" %}">Submission of Requirements tracker</a></li>
+                        <li><a href="{% url "adminapplication" %}">Application tracker</a></li>
+                        <li><a href="{% url "profile" %}">Scholars Profile and Validation</a></li>
+                        <li><a href="{% url "mentor" %}">Mentorship Program</a></li>
+                        <li><a href="{% url "liquidation" %}">Admin Cost Liquidation Tracker</a></li>
+                        <li><a href="{% url "ched" %}">CHED Reports Submission</a></li>
+                        <li><a href="{% url "transaction" %}">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="jobplace-btn">JOB PLACEMENT
+                        <span class="fas fa-caret-down third"></span>    
+                    </a>
+                    <ul class="jobplace-show">
+                        <li><a href="#">OJT Hiring</a></li>
+                        <li><a href="#">Career Guidance Tracker</a></li>
+                        <li><a href="#">OJT Requirements Tracker</a></li>
+                        <li><a href="#">Non-Academic Award Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="student_disc-btn">STUDENT DISCIPLINE
+                       <span class="fas fa-caret-down fourth"></span>
+                    </a>
+                    <ul class="student_disc-show">
+                        <li><a href="#">Case Profile</a></li>
+                        <li><a href="#">Hours Rendered for Community Service Tracker</a></li>
+                        <li><a href="#">Good Moral Certificate Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="guide-btn">GUIDANCE
+                       <span class="fas fa-caret-down fifth"></span>
+                    </a>
+                    <ul class="guide-show">
+                        <li><a href="#">Individual Profile with Guidance Concern</a></li>
+                        <li><a href="#">Counseling App with Scheduler</a></li>
+                        <li><a href="#">Intake Interview</a></li>
+                        <li><a href="#">Exit Interview</a></li>
+                        <li><a href="#">OJT Assessments/Psychological Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="alumni-btn">ALUMNI
+                       <span class="fas fa-caret-down sixth"></span>
+                    </a>
+                    <ul class="alumni-show">
+                        <li><a href="#">Alumni ID Requests</a></li>
+                        <li><a href="#">Graduate Tracer</a></li>
+                        <li><a href="#">Alumni Reunion and Events</a></li>
+                        <li><a href="#">Job Fairs</a></li>
+                        <li><a href="#">Digital Yearbook</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="community-btn">COMMUNITY INVOLVEMENT
+                       <span class="fas fa-caret-down seventh"></span>
+                    </a>
+                    <ul class="community-show">
+                        <li><a href="#">Events</a></li>
+                        <li><a href="#">CrowdFunding Projects</a></li>
+                        <li><a href="#">Donatio App</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="student_org-btn">STUDENT ORGANIZATION
+                       <span class="fas fa-caret-down eighth"></span>
+                    </a>
+                    <ul class="student_org-show">
+                        <li><a href="#">Org Profile</a></li>
+                        <li><a href="#">Projects and Accomplishments</a></li>
+                        <li><a href="#">Financial Statements Reports</a></li>
+                        <li><a href="#">Accreditation Application</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="medical-btn">MEDICAL
+                       <span class="fas fa-caret-down ninth"></span>
+                    </a>
+                    <ul class="medical-show">
+                        <li><a href="#">Patient Profile</a></li>
+                        <li><a href="#">Student Medical Requirements Tracker</a></li>
+                        <li><a href="#">Emergency Health Assistance</a></li>
+                        <li><a href="#">PWD Profile</a></li>
+                        <li><a href="#">Dental Services</a></li>
+                        <li><a href="#">Medical Clearance Issuance</a></li>
+                        <li><a href="#">Prescription Issuance</a></li>
+                        <li><a href="#">Transaction Reports</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="content_box">
+        <div class="search-container">
+            <div class="search-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <input type="text" placeholder="Search...">
+            <a href="{% url "logout" %}"><button style="padding: 10px 20px; background-color: #FF8000; border-radius: 5px; border: none; margin-left: 520px;">Log out</button></a>
+        </div>
+        <div class="content">
+            <div class="form_div">
+                <h1>Scholarship Submission Tracker</h1>
+                <form class="search_id_container" action="{% url 'admin_req' %}" method="GET">
+                    <input type="text" id="search-box" name="search" placeholder="Search by ApplicationID">
+                    <button id="search-btn">Search</button>
+                    <select style="color: black;" id="student_type" name="student_type" required>
+                        <option style="color: black;" value="">SELECT SCHOLAR TYPE</option>
+                        <option style="color: black;" value="SCHOLAR">SCHOLAR</option>
+                        <option style="color: black;" value="NON_SCHOLAR">NON-SCHOLAR</option>
+                    </select>
+                </form>
+                <script>
+                    $(document).ready(function() {
+                        $('#student_type').change(function() {
+                            $(this).closest('form').submit();
+                        });
+                    });
+                </script>
+                <table id="requirements-table">
+                    <thead>
+                        <tr>
+                            {% if student_type == 'SCHOLAR' %}
+                                <th>Student ID</th>
+                                <th>Scholar ID</th>
+                                <th>First name</th>
+                                <th>Last name</th>
+                                <th>COR</th>
+                                <th>School ID</th>
+                                <th>Grade</th>
+                                <th>GPA</th>
+                                <th>Note</th>
+                                <th>Confirmation</th>
+                            {% elif student_type == 'NON_SCHOLAR' %}
+                                <th>Student ID</th>
+                                <th>First name</th>
+                                <th>Last name</th>
+                                <th>COR</th>
+                                <th>School ID</th>
+                                <th>Grade</th>
+                                <th>GPA</th>
+                                <th>Note</th>
+                                <th>Confirmation</th>
+                            {% else %}
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if student_type == 'SCHOLAR' %}
+                            {% for scholar in requirement_data %}
+                                <tr>
+                                    <td>{{ scholar.studID.studID }}</td>
+                                    <td>{{ scholar.scholar_ID }}</td>
+                                    <td>{{ scholar.studID.firstname }}</td>
+                                    <td>{{ scholar.studID.lastname }}</td>
+                                    <td><img id="cor_pic" src="{{ scholar.cor_file.url }}" alt=""></td>
+                                    <td><img id="grade_pic" src="{{ scholar.grade_file.url }}" alt=""></td>
+                                    <td><img id="schoolid_pic" src="{{ scholar.schoolid_file.url }}" alt=""></td>
+                                    <td>{{ scholar.gpa }}</td>
+                                    <td class="commentbox"><input type="text" class="comment-box"></td>
+                                    <td>
+                                        <button class="btn-accept">Accept</button>
+                                        <button class="btn-reject">Reject</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% elif student_type == 'NON_SCHOLAR' %}
+                            {% for non_scholar in requirement_data %}
+                            <tr>
+                                <td>{{ non_scholar.studID.studID }}</td>
+                                <td>{{ non_scholar.studID.firstname }}</td>
+                                <td>{{ non_scholar.studID.lastname }}</td>
+                                <td><img id="cor_pic" src="{{ scholar.studID.cor_file.url }}" alt=""></td>
+                                <td><img id="grade_pic" src="{{ scholar.studID.grade_file.url }}" alt=""></td>
+                                <td><img id="schoolid_pic" src="{{ scholar.studID.schoolid_file.url }}" alt=""></td>
+                                <td>{{ non_scholar.gpa }}</td>
+                                <td class="commentbox"><input type="text" class="comment-box"></td>
+                                <td>
+                                    <button class="btn-accept">Accept</button>
+                                    <button class="btn-reject">Reject</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+
+                        {% endif %}
+
+                    </tbody>
+                </table>
+                <div style="text-align: center;">
+                    <button class="btnUpdate">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

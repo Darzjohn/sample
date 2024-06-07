@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register Form</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style1.css' %}">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+  <div class="wrapper">
+    <form method="POST">
+      {% csrf_token %}
+      <h1>Register</h1>
+      <div class="input-box">
+        <input type="text" placeholder="Student ID" name="studID" required>
+        <i class='bx bxs-user'></i>
+      </div>
+      <div class="input-box">
+        <input type="email" placeholder="Email" name="email" required>
+        <i class='bx bxs-user'></i>
+      </div>
+      <div class="input-box">
+        <input type="password" placeholder="Password" name="password" required>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
+      <div class="input-box">
+        <input type="password" placeholder="Confirm password" name="cpassword" required>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
+      {% if error_message %}
+      <center><p style="color: red; margin-bottom: 15px; ">{{error_message}}</p></center>
+            {% endif %}
+      <button type="submit" class="btn">Register</button>
+      <div class="register-link">
+        <p>Already have an account? <a href="{% url 'signinuser' %}">Login</a></p>
+      </div>
+      {% if messages %}
+          {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+    </form>
+  </div>
+  <script>
+    {% if success_message %}
+    alert('{{ success_message }}');
+    {% endif %}
+  </script>
+</body>
+</html>
